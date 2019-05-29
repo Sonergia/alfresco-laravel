@@ -1,6 +1,7 @@
 <?php
 
-Route::group(['prefix' => 'ajtarragona/alfresco','middleware' => ['web','auth','language']	], function () {
+//Route::group(['prefix' => 'ajtarragona/alfresco','middleware' => ['web','auth','language']	], function () {
+Route::group(['prefix' => 'ajtarragona/alfresco','middleware'], function () {
 	Route::get('download/{id}', ['uses' => 'Ajtarragona\AlfrescoLaravel\Controllers\AlfrescoLaravelController@download', 'as' => 'alfresco.download']);
 	Route::get('view/{id}', ['uses' => 'Ajtarragona\AlfrescoLaravel\Controllers\AlfrescoLaravelController@viewDocument', 'as' => 'alfresco.view']);
 	Route::get('preview/{id}', ['uses' => 'Ajtarragona\AlfrescoLaravel\Controllers\AlfrescoLaravelController@previewDocument', 'as' => 'alfresco.preview']);

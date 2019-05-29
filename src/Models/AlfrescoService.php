@@ -97,6 +97,15 @@ class AlfrescoService
 		return $this->provider->getObjectByPath($objectPath);
 	}
 
+    /**
+     * Retorna un Tag objecte d'Alfresco passant el seu ID
+     * @param objecteId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function getTagObject($objectId){
+        return $this->provider->getTagObject($objectId);
+    }
 
 
 	/**

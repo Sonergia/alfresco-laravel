@@ -263,12 +263,15 @@ class AlfrescoRestProvider
 	 * @return
 	 */
 	protected function fromRestObject($o){
-		//dump($o);
-		if($o->entry->isFile){
+		if(isset($o->entry) && $o->entry->isFile){
 			return AlfrescoDocument::fromRestDocument($o->entry, $this);
-		}else if($o->entry->isFolder){
+		}else if(isset($o->entry) && $o->entry->isFolder){
 			return AlfrescoFolder::fromRestFolder($o->entry, $this);
-		}else return null;
+        }else if(isset($o->list) && $o->list->entries){
+            return $o->list->entries;
+		}else {
+            return null;
+        }
 
 	}
 
@@ -354,6 +357,34 @@ class AlfrescoRestProvider
 	}
 
 
+    /**
+     * Retorna un Tag objecte d'Alfresco passant el seu ID
+     * @param objecteId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function getTagObject($objectId){
+
+        $url = ($objectId === 'all' ? 'tags' : 'nodes/'.$objectId.'/tags');
+        /*
+        if($objectId === 'all'){
+            $response=$this->call('GET','tags',[
+                "query"=>['include'=>'path']
+            ]);
+        } else {
+            $response=$this->call('GET','nodes/'.$objectId.'/tags',[
+                "query" => ['include' => 'path']
+            ]);
+        }
+        */
+        $response=$this->call('GET',$url,[
+            "query" => ['include' => 'path']
+        ]);
+
+        $obj=$this->fromRestObject($response);
+        return $obj;
+
+    }
 
 	
 

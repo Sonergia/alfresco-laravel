@@ -509,7 +509,7 @@ class AlfrescoRestProvider
 		
 			
 		$params=[
-			'include'=>'path',
+			'include'=>'path,properties',
 			'maxItems' => self::PAGINATION_ITEMS,
 			'skipCount' => ($page-1)*self::PAGINATION_ITEMS
 		];

@@ -107,6 +107,25 @@ class AlfrescoService
         return $this->provider->getTagObject($objectId);
     }
 
+    /**
+     * Add Tag to Alfresco object ID
+     * @param objecteId, tagId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function addTagObject($objectId, $tag){
+        return $this->provider->addTagObject($objectId, $tag);
+    }
+
+    /**
+     * Delete Tag to Alfresco object ID
+     * @param objecteId, tagId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function delTagObject($objectId, $tag){
+        return $this->provider->delTagObject($objectId, $tag);
+    }
 
 	/**
 	 * Descarrega el contingut d'un objecte passant el seu ID

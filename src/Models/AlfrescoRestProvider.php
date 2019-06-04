@@ -160,9 +160,9 @@ class AlfrescoRestProvider
 		    
 		    if ($e->hasResponse()) {
 		    	//dd($e->getResponse());
-		       $status=$e->getResponse()->getStatusCode();
+		    	$status=$e->getResponse()->getStatusCode();
 
-		       switch($status){
+		    	switch($status){
 			       	case 404:
 						throw new AlfrescoObjectNotFoundException(__("Object not found in Alfresco")); break;
 					case 401:
@@ -182,8 +182,7 @@ class AlfrescoRestProvider
 						//name containing invalid characters
 						throw new AlfrescoIntegrityException(__("Integrity Exception")); break;
 					default: break;
-					
-		       }
+		    	}
 		    }
 
 		    Log::error("Error connecting to Alfresco server");
@@ -366,17 +365,6 @@ class AlfrescoRestProvider
     public function getTagObject($objectId){
 
         $url = ($objectId === 'all' ? 'tags' : 'nodes/'.$objectId.'/tags');
-        /*
-        if($objectId === 'all'){
-            $response=$this->call('GET','tags',[
-                "query"=>['include'=>'path']
-            ]);
-        } else {
-            $response=$this->call('GET','nodes/'.$objectId.'/tags',[
-                "query" => ['include' => 'path']
-            ]);
-        }
-        */
         $response=$this->call('GET',$url,[
             "query" => ['include' => 'path']
         ]);
@@ -386,7 +374,29 @@ class AlfrescoRestProvider
 
     }
 
-	
+    /**
+     * Add Tag to Alfresco object ID
+     * @param objecteId, tagId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function addTagObject($objectId, $tag){
+        $url = 'nodes/'.$objectId.'/tags';
+        $response=$this->call('POST', $url, [ "body" => $tag ]);
+        return json_encode($response->entry);
+    }
+
+    /**
+     * Delete Tag to Alfresco object ID
+     * @param objecteId, tagId
+     * @return AlfrescoFolder
+     * @throws AlfrescoObjectNotFoundException
+     */
+    public function delTagObject($objectId, $tagId){
+        $url = 'nodes/'.$objectId.'/tags/'.$tagId;
+        $response=$this->call('DELETE', $url);
+        return json_encode($response);
+    }
 
 
 	/**
@@ -917,9 +927,9 @@ class AlfrescoRestProvider
 				$filetype=$document->getMimeType();
 			}
 		}else{
-			$filename=$doc["name"];
-			$filecontent=file_get_contents($doc["tmp_name"]);
-			$filetype=mime_content_type($doc["tmp_name"]);
+			$filename=$document["name"];
+			$filecontent=file_get_contents($document["tmp_name"]);
+			$filetype=mime_content_type($document["tmp_name"]);
 		}
 
 		//dump($error);
@@ -929,19 +939,19 @@ class AlfrescoRestProvider
 				if($obj){
 					return $obj;
 				}else{
-					 return __("L'arxiu <strong>:name</strong> ja existeix al repositori",["name"=>$filename]);
+					 return __("Le fichier <strong>:name</strong> existe déjà dans le répertoire",["name"=>$filename]);
 				}
 			}catch(Exception $e){
-				return __("Error pujant arxiu <strong>:name</strong> al repositori",["name"=>$filename]);
+				return __("Error lors de l\'upload du fichier <strong>:name</strong> dans le répertoire",["name"=>$filename]);
 			}
 		}else{
-			return __("Error pujant arxiu <strong>:name</strong> al repositori",["name"=>$filename]);
+			return __("Error lors de l\'upload du fichier <strong>:name</strong> dans le répertoire",["name"=>$filename]);
 		}
 	}
 
 
 	public function upload($parentId, $documents){
-		
+
 		$ret=array();
 
 		if(is_array($documents)){

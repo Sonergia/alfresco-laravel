@@ -153,8 +153,8 @@ class AlfrescoDocument extends AlfrescoObject {
 		
 		return $doc;
 	}
-	
-	
+
+
 	/**
 	 * Esborra aquest document
 	 */

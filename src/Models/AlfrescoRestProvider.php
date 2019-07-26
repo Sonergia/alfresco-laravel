@@ -133,6 +133,9 @@ class AlfrescoRestProvider
 
 		try{
 			$response = $this->client->request($method, $url, $args);
+			//$request = $this->client->createRequest($method, $url, $args);
+			//$request->setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+			//$response = $this->client->send($request);
 			// dump($response->getStatusCode());
 			//dump($response);
 			//dd((string)$response->getBody());
@@ -303,8 +306,9 @@ class AlfrescoRestProvider
 
     public function existsPath($objectPath){
 		try{
-			$this->getObjectByPath($objectPath);
-			return true;
+			//$this->getObjectByPath($objectPath);
+			//return true;
+			return $this->getObjectByPath($objectPath);
 		}catch(AlfrescoObjectNotFoundException $e){
 			return false;
 		}
@@ -930,6 +934,11 @@ class AlfrescoRestProvider
 			$filename=$document["name"];
 			$filecontent=file_get_contents($document["tmp_name"]);
 			$filetype=mime_content_type($document["tmp_name"]);
+			/*
+			$filename=$document->getFilename();
+			$filecontent=$document->fread($document->getSize());
+			$filetype=$document->getType();
+			*/
 		}
 
 		//dump($error);

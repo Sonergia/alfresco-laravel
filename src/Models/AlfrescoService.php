@@ -5,7 +5,6 @@ namespace Ajtarragona\AlfrescoLaravel\Models;
 use Ajtarragona\AlfrescoLaravel\Models\AlfrescoCmisProvider;
 use Ajtarragona\AlfrescoLaravel\Models\AlfrescoRestProvider;
 
-
 class AlfrescoService
 {
 
@@ -19,9 +18,10 @@ class AlfrescoService
 
 	public function __construct($settings=false) { 
 
-		if(!$settings) $settings=config('alfresco');
-		$settings=to_object($settings);
-		
+		//if(!$settings) $settings=config('alfresco');
+		$settings=array_merge(config('alfresco'), (is_array($settings) ? $settings :  array()));
+        $settings=to_object($settings);
+
 		if($settings->api=="cmis") $this->provider = new AlfrescoCmisProvider($settings);
 		else $this->provider = new AlfrescoRestProvider($settings);
 		
@@ -49,8 +49,15 @@ class AlfrescoService
 	}
 
 
-	
-	/**
+    /**
+     * @param baseid
+     */
+    public function setBaseid($baseid){
+        $this->provider->setBaseid($baseid);
+    }
+
+
+    /**
 	 * Retorna el BaseFolder (el directori arrel a partir del basepath, si està definit)
 	 * @return
 	 * @throws AlfrescoObjectNotFoundException

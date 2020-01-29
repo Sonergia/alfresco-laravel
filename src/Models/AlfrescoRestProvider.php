@@ -44,6 +44,7 @@ class AlfrescoRestProvider
 	
 	protected $rootpath;
 	protected $basepath;
+    protected $baseid;
 	protected $alfrescourl;
 	protected $apiuser;
 	protected $apipwd;
@@ -57,7 +58,7 @@ class AlfrescoRestProvider
 
 	
 
-	public function __construct($settings=false) { 
+	public function __construct($settings=false) {
 
 		if(!$settings){
 			$settings=config('alfresco');
@@ -66,10 +67,18 @@ class AlfrescoRestProvider
 		
 		// $this->rootpath=$settings->base_path;
 		// if(!ends_with($this->rootpath,"/")) $this->rootpath.="/";
-		
-		$this->baseid=$settings->base_id;
+
+        //$this->baseid=(isset($settings->base_id) ? $settings->base_id : '-default-');
+		//if(!$this->baseid){
+        //    if($this->debug) Log::debug("ALFRESCO: La variable base_id est indéfinie");
+        //    throw new AlfrescoObjectNotFoundException(__("ALFRESCO: La variable base_id est indéfinie"));
+        //} else {
+        //    $this->rootpath =  $this->getBasepath(true);
+        //}
 
 		$this->basepath= "";
+        if(!isset($this->baseid)) $this->baseid= "";
+        //$this->baseid= "-default-";
 
 		$this->alfrescourl = $settings->url;
 		if(!ends_with($this->alfrescourl,"/")) $this->alfrescourl.="/";
@@ -87,7 +96,7 @@ class AlfrescoRestProvider
 
 		
 		$this->connect();
-		$this->rootpath =  $this->getBasepath(true);
+        $this->rootpath = $this->getBasepath(true);
 	}
 
 
@@ -215,7 +224,7 @@ class AlfrescoRestProvider
 	 * @return String
 	 */
 	public function getBasepath($full=false){
-		if($full){
+		if($full && $this->baseid){
 			$folder=$this->getBaseFolder();
 			return $folder->fullpath.($this->basepath?"/".$this->basepath:'');
 		}else{
@@ -233,6 +242,12 @@ class AlfrescoRestProvider
 		if(!ends_with($this->basepath,"/")) $this->basepath.="/";
 	}
 
+    /**
+     * @param baseid
+     */
+    public function setBaseid($baseid){
+        $this->baseid=$baseid;
+    }
 
 	/**
 	 * Genera la URL del servei Rest d'Alfresco
@@ -254,7 +269,6 @@ class AlfrescoRestProvider
 	 */
 	public function getBaseFolder(){ // throws AlfrescoObjectNotFoundException{
 		return $this->getObject($this->baseid);
-
 	}
 
 
@@ -629,6 +643,8 @@ class AlfrescoRestProvider
 			$parentFolder = $this->getFolder($parentId);
 		}
 
+		Log::debug($this->baseid);
+		Log::debug($parentFolder);
 
 		if($parentFolder)
 			return $this->doCreateFolder($folderName,$parentFolder);

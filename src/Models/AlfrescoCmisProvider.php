@@ -65,6 +65,7 @@ class AlfrescoCmisProvider
 		
 
 		$this->basepath= "";
+        $this->baseid= "";
 
 		$this->alfrescourl = $settings->url;
 		if(!ends_with($this->alfrescourl,"/")) $this->alfrescourl.="/";

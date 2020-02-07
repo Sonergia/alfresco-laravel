@@ -3,6 +3,7 @@
 namespace Ajtarragona\AlfrescoLaravel\Models;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Src;
 
 use Ajtarragona\AlfrescoLaravel\Models\Vendor\Zip\TbsZip;
 
@@ -60,7 +61,7 @@ class AlfrescoCmisProvider
 		}
 		
 		$this->rootpath=$settings->base_path;
-		if(!ends_with($this->rootpath,"/")) $this->rootpath.="/";
+		if(!Str::endsWith($this->rootpath,"/")) $this->rootpath.="/";
 		
 		
 
@@ -68,7 +69,7 @@ class AlfrescoCmisProvider
         $this->baseid= "";
 
 		$this->alfrescourl = $settings->url;
-		if(!ends_with($this->alfrescourl,"/")) $this->alfrescourl.="/";
+		if(!Str::endsWith($this->alfrescourl,"/")) $this->alfrescourl.="/";
 
 		$this->apiuser = $settings->user;
 		$this->apipwd = $settings->pass;
@@ -147,7 +148,7 @@ class AlfrescoCmisProvider
 	 */
 	public function setBasepath($path){
 		$this->basepath=$path;
-		if(!ends_with($this->basepath,"/")) $this->basepath.="/";
+		if(!Str::endsWith($this->basepath,"/")) $this->basepath.="/";
 	}
 
 
@@ -858,7 +859,7 @@ class AlfrescoCmisProvider
 			$target=$obj->getParent();
 			
 			if($obj->isDocument()){
-				if(!ends_with($newName,".".$obj->extension)) $newName.=".".$obj->extension;
+				if(!Str::endsWith($newName,".".$obj->extension)) $newName.=".".$obj->extension;
 
 				$contents=$this->session->getContentStream($obj->id);
 				

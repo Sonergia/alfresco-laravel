@@ -3,6 +3,7 @@
 namespace Ajtarragona\AlfrescoLaravel\Models;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 use Ajtarragona\AlfrescoLaravel\Models\Vendor\Zip\TbsZip;
 
@@ -66,7 +67,7 @@ class AlfrescoRestProvider
 		}
 		
 		// $this->rootpath=$settings->base_path;
-		// if(!ends_with($this->rootpath,"/")) $this->rootpath.="/";
+		// if(!Str::endsWith($this->rootpath,"/")) $this->rootpath.="/";
 
         //$this->baseid=(isset($settings->base_id) ? $settings->base_id : '-default-');
 		//if(!$this->baseid){
@@ -81,7 +82,7 @@ class AlfrescoRestProvider
         //$this->baseid= "-default-";
 
 		$this->alfrescourl = $settings->url;
-		if(!ends_with($this->alfrescourl,"/")) $this->alfrescourl.="/";
+		if(!Str::endsWith($this->alfrescourl,"/")) $this->alfrescourl.="/";
 
 		$this->apiuser = $settings->user;
 		$this->apipwd = $settings->pass;
@@ -239,7 +240,7 @@ class AlfrescoRestProvider
 	 */
 	public function setBasepath($path){
 		$this->basepath=$path;
-		if(!ends_with($this->basepath,"/")) $this->basepath.="/";
+		if(!Str::endsWith($this->basepath,"/")) $this->basepath.="/";
 	}
 
     /**
@@ -836,7 +837,7 @@ class AlfrescoRestProvider
 		$newName=AlfrescoHelper::sanitizeName($newName);
 
 		if($obj->isDocument() && $obj->extension){
-			if(!ends_with($newName,".".$obj->extension)) $newName.=".".$obj->extension;
+			if(!Str::endsWith($newName,".".$obj->extension)) $newName.=".".$obj->extension;
 		}
 		
 		$return=$this->call('PUT','nodes/'.$obj->id, [

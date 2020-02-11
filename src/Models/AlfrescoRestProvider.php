@@ -595,7 +595,8 @@ class AlfrescoRestProvider
 	private function doCreateFolder($folderName, $parentfolder){ // throws AlfrescoObjectNotFoundException, AlfrescoObjectAlreadyExistsException{
 		//dump("doCreateFolder");
 
-			if(str_contains($folderName,"/")){
+			//if(str_contains($folderName,"/")){
+            if(Str::contains($folderName,"/")){
 				$path_parts = pathinfo($folderName);
 				$relativePath = AlfrescoHelper::sanitizeDir($path_parts['dirname']);
 				$folderName = AlfrescoHelper::sanitizeName($path_parts['basename']);

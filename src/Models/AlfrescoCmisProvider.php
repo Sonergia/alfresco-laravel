@@ -495,7 +495,8 @@ class AlfrescoCmisProvider
 		try{
 			//dd("ALFRESCO: createFolder(".$folderName.") in folder " . $parentfolder->id);
 			
-    		if(str_contains($folderName,"/")){
+    		//if(str_contains($folderName,"/")){
+            if(Str::contains($folderName,"/")){
     			//si tiene subdirectorios
 
     			$path=explode("/", $folderName);

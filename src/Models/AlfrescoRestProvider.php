@@ -177,23 +177,23 @@ class AlfrescoRestProvider
 
 		    	switch($status){
 			       	case 404:
-						throw new AlfrescoObjectNotFoundException(__("Object not found in Alfresco")); break;
+						throw new AlfrescoObjectNotFoundException(__("Object not found in Alfresco"), 404); break;
 					case 401:
 						//Authentication exception
-						throw new AlfrescoAuthenticationException(__("User authentication exception")); break;
+						throw new AlfrescoAuthenticationException(__("User authentication exception"), 401); break;
 					case 403:
 						//Permissions exception
-						throw new AlfrescoNotAllowedException(__("User doesn't have permission")); break;
+						throw new AlfrescoNotAllowedException(__("User doesn't have permission"), 403); break;
 					case 409: 
 						//New name clashes with an existing node in the current parent folder
-						throw new AlfrescoObjectAlreadyExistsException(__("Name already exists")); break;
+						throw new AlfrescoObjectAlreadyExistsException(__("Name already exists"), 409); break;
 					case 413: 
 					case 507: 
 						//size limit
-						throw new AlfrescoSizeLimitException(__("Size limit exceeded")); break;
+						throw new AlfrescoSizeLimitException(__("Size limit exceeded"), 507); break;
 					case 422: 
 						//name containing invalid characters
-						throw new AlfrescoIntegrityException(__("Integrity Exception")); break;
+						throw new AlfrescoIntegrityException(__("Integrity Exception"), 422); break;
 					default: break;
 		    	}
 		    }

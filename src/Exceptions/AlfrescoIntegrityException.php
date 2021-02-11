@@ -1,5 +1,13 @@
 <?php
-namespace Ajtarragona\AlfrescoLaravel\Exceptions;
+
+namespace Sonergia\AlfrescoLaravel\Exceptions;
+
 use Exception;
 
-class AlfrescoIntegrityException extends Exception {}
+/**
+ * Class AlfrescoIntegrityException
+ * @package Sonergia\AlfrescoLaravel\Exceptions
+ */
+class AlfrescoIntegrityException extends Exception
+{
+}

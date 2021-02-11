@@ -1,5 +1,13 @@
 <?php
-namespace Ajtarragona\AlfrescoLaravel\Exceptions;
+
+namespace Sonergia\AlfrescoLaravel\Exceptions;
+
 use Exception;
 
-class AlfrescoSizeLimitException extends Exception {}
+/**
+ * Class AlfrescoSizeLimitException
+ * @package Sonergia\AlfrescoLaravel\Exceptions
+ */
+class AlfrescoSizeLimitException extends Exception
+{
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ajtarragona\AlfrescoLaravel\Models;
+namespace Sonergia\AlfrescoLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Log;

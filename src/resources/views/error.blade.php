@@ -1,16 +1,16 @@
-@extends('ajtarragona-web-components::layout/master')
+@extends('Sonergia-web-components::layout/master')
 
 @section('title')
-	@lang('Alfresco Error')
+    @lang('Alfresco Error')
 @endsection
 
 
 
 @section('body')
-		
-		@container(['fluid'=>false,'class'=>'pt-5'])
-			@alert(['type'=>'danger'])
-				{!! $error !!}
-			@endalert
-		@endcontainer
+
+    @container(['fluid'=>false,'class'=>'pt-5'])
+    @alert(['type'=>'danger'])
+    {!! $error !!}
+    @endalert
+    @endcontainer
 @endsection

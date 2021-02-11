@@ -1,5 +1,13 @@
 <?php
-namespace Ajtarragona\AlfrescoLaravel\Exceptions;
+
+namespace Sonergia\AlfrescoLaravel\Exceptions;
+
 use Exception;
 
-class AlfrescoObjectAlreadyExistsException extends Exception {}
+/**
+ * Class AlfrescoObjectAlreadyExistsException
+ * @package Sonergia\AlfrescoLaravel\Exceptions
+ */
+class AlfrescoObjectAlreadyExistsException extends Exception
+{
+}

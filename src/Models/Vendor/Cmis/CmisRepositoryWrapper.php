@@ -1,21 +1,23 @@
 <?php
-namespace Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis;
+
+namespace Sonergia\AlfrescoLaravel\Models\Vendor\Cmis;
+
 use stdClass;
 use DOMDocument;
 use DomXPath;
 
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisInvalidArgumentException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisObjectNotFoundException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisPermissionDeniedException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisNotSupportedException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisConstraintException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisRuntimeException;
-use Ajtarragona\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisNotImplementedException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisInvalidArgumentException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisObjectNotFoundException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisPermissionDeniedException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisNotSupportedException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisConstraintException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisRuntimeException;
+use Sonergia\AlfrescoLaravel\Models\Vendor\Cmis\Exceptions\CmisNotImplementedException;
 
 
 class CmisRepositoryWrapper
 {
-    
+
     const HTTP_OK = 200;
     const HTTP_CREATED = 201;
     const HTTP_ACCEPTED = 202;
@@ -38,8 +40,6 @@ class CmisRepositoryWrapper
     const HTTP_INTERNAL_SERVER_ERROR = 500; // runtime, storage
 
 
-
-
     // Handles --
     //   Workspace -- but only endpoints with a single repo
     //   Entry -- but only for objects
@@ -51,9 +51,8 @@ class CmisRepositoryWrapper
     // Only Handles Basic Auth
     // Very Little Error Checking
     // Does not work against pre CMIS 1.0 Repos
-    
-    
-    
+
+
     protected $url;
     protected $username;
     protected $password;
@@ -62,54 +61,57 @@ class CmisRepositoryWrapper
     protected $last_request;
     protected $do_not_urlencode;
     protected $_addlCurlOptions = array();
-    
-    
-    
-    static $namespaces = array (
+
+
+    static $namespaces = array(
         "cmis" => "http://docs.oasis-open.org/ns/cmis/core/200908/",
         "cmisra" => "http://docs.oasis-open.org/ns/cmis/restatom/200908/",
         "atom" => "http://www.w3.org/2005/Atom",
         "app" => "http://www.w3.org/2007/app",
-        
+
     );
 
 
-
-   public function __construct($url, $username = null, $password = null, $options = null, array $addlCurlOptions = array())
-    {
+    public function __construct(
+        $url,
+        $username = null,
+        $password = null,
+        $options = null,
+        array $addlCurlOptions = array()
+    ) {
         if (is_array($options) && $options["config:do_not_urlencode"]) {
-            $this->do_not_urlencode=true;
+            $this->do_not_urlencode = true;
         }
         $this->_addlCurlOptions = $addlCurlOptions; // additional cURL options
-        
+
         $this->connect($url, $username, $password, $options);
     }
 
 
-    protected static function getAsArray($prop) {
-    	if ($prop == null) {
-			return array();
-		} elseif (!is_array($prop)) {
-			return array($prop);
-		} else {
-			return($prop);
-		}
-		    	
+    protected static function getAsArray($prop)
+    {
+        if ($prop == null) {
+            return array();
+        }
+
+        if (!is_array($prop)) {
+            return array($prop);
+        } else {
+            return ($prop);
+        }
     }
 
 
     protected static function getOpUrl($url, $options = null)
     {
-        if (is_array($options) && (count($options) > 0))
-        {
+        if (is_array($options) && (count($options) > 0)) {
             $needs_question = strstr($url, "?") === false;
             return $url . ($needs_question ? "?" : "&") . http_build_query($options);
-        } else
-        {
-            return $url;
         }
+
+        return $url;
     }
-    
+
 
     protected function convertStatusCode($code, $message)
     {
@@ -126,7 +128,7 @@ class CmisRepositoryWrapper
                 return new CmisConstraintException($message, $code);
             default:
                 return new CmisRuntimeException($message, $code);
-            }
+        }
     }
 
 
@@ -139,10 +141,9 @@ class CmisRepositoryWrapper
         $this->auth_options = $options;
         $this->authenticated = false;
         $retval = $this->doGet($this->url);
-        if ($retval->code == self::HTTP_OK || $retval->code == self::HTTP_CREATED)
-        {
+        if ($retval->code == self::HTTP_OK || $retval->code == self::HTTP_CREATED) {
             $this->authenticated = true;
-            $this->workspace = self :: extractWorkspace($retval->body);
+            $this->workspace = self:: extractWorkspace($retval->body);
         }
     }
 
@@ -150,8 +151,7 @@ class CmisRepositoryWrapper
     protected function doGet($url)
     {
         $retval = $this->doRequest($url);
-        if ($retval->code != self::HTTP_OK)
-        {
+        if ($retval->code != self::HTTP_OK) {
             throw $this->convertStatusCode($retval->code, $retval->body);
         }
         return $retval;
@@ -161,8 +161,7 @@ class CmisRepositoryWrapper
     protected function doDelete($url)
     {
         $retval = $this->doRequest($url, "DELETE");
-        if ($retval->code != self::HTTP_NO_CONTENT)
-        {
+        if ($retval->code != self::HTTP_NO_CONTENT) {
             throw $this->convertStatusCode($retval->code, $retval->body);
         }
         return $retval;
@@ -171,12 +170,9 @@ class CmisRepositoryWrapper
 
     protected function doPost($url, $content, $contentType, $charset = null)
     {
-       
-        
         $retval = $this->doRequest($url, "POST", $content, $contentType);
 
-        if ($retval->code != self::HTTP_CREATED)
-        {
+        if ($retval->code != self::HTTP_CREATED) {
             throw $this->convertStatusCode($retval->code, $retval->body);
         }
         return $retval;
@@ -186,8 +182,7 @@ class CmisRepositoryWrapper
     protected function doPut($url, $content, $contentType, $charset = null)
     {
         $retval = $this->doRequest($url, "PUT", $content, $contentType);
-        if (($retval->code < self::HTTP_OK) || ($retval->code >= self::HTTP_MULTIPLE_CHOICES))
-        {
+        if (($retval->code < self::HTTP_OK) || ($retval->code >= self::HTTP_MULTIPLE_CHOICES)) {
             throw $this->convertStatusCode($retval->code, $retval->body);
         }
         return $retval;
@@ -196,42 +191,39 @@ class CmisRepositoryWrapper
 
     protected function doRequest($url, $method = "GET", $content = null, $contentType = null, $charset = null)
     {
-        
-        
         // Process the HTTP request
         // 'til now only the GET request has been tested
         // Does not URL encode any inputs yet
-        if (is_array($this->auth_options))
-        {
-            $url = self :: getOpUrl($url, $this->auth_options);
+        if (is_array($this->auth_options)) {
+            $url = self:: getOpUrl($url, $this->auth_options);
         }
-        
+
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_HEADER, false);
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 
-        if ($this->username)
-        {
+        if ($this->username) {
             curl_setopt($session, CURLOPT_USERPWD, $this->username . ":" . $this->password);
         }
         curl_setopt($session, CURLOPT_CUSTOMREQUEST, $method);
-        if ($contentType)
-        {
-            curl_setopt($session, CURLOPT_HTTPHEADER, array (
-                "Content-Type: " . $contentType
-            ));
+        if ($contentType) {
+            curl_setopt(
+                $session,
+                CURLOPT_HTTPHEADER,
+                array(
+                    "Content-Type: " . $contentType
+                )
+            );
         }
 
-        if ($content)
-        {
+        if ($content) {
             curl_setopt($session, CURLOPT_POSTFIELDS, $content);
         }
 
-        if ($method == "POST")
-        {
+        if ($method == "POST") {
             curl_setopt($session, CURLOPT_POST, true);
         }
-        
+
 
         // apply addl. cURL options
         // WARNING: this may override previously set options
@@ -240,8 +232,8 @@ class CmisRepositoryWrapper
                 curl_setopt($session, $key, $value);
             }
         }
-        
-        
+
+
         //TODO: Make this storage optional
         $retval = new stdClass();
         $retval->url = $url;
@@ -305,20 +297,17 @@ class CmisRepositoryWrapper
 
     // Static Utility Functions
 
-    protected static function processTemplate($template, $values = array ())
+    protected static function processTemplate($template, $values = array())
     {
         // Fill in the blanks -- 
         $retval = $template;
-        if (is_array($values))
-        {
-            foreach ($values as $name => $value)
-            {
+        if (is_array($values)) {
+            foreach ($values as $name => $value) {
                 $retval = str_replace("{" . $name . "}", $value, $retval);
             }
         }
         // Fill in any unpoupated variables with ""
         return preg_replace("/{[a-zA-Z0-9_]+}/", "", $retval);
-
     }
 
 
@@ -326,7 +315,7 @@ class CmisRepositoryWrapper
     {
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: doXQueryFromNode($doc, $xquery);
+        return self:: doXQueryFromNode($doc, $xquery);
     }
 
 
@@ -337,19 +326,17 @@ class CmisRepositoryWrapper
         //THis may be a hopeless HACK!
         //TODO: Review
         if (!($xmlnode instanceof DOMDocument)) {
-            $xdoc=new DOMDocument();
-            $xnode = $xdoc->importNode($xmlnode,true);
+            $xdoc = new DOMDocument();
+            $xnode = $xdoc->importNode($xmlnode, true);
             $xdoc->appendChild($xnode);
             $xpath = new DomXPath($xdoc);
         } else {
-        	$xpath = new DomXPath($xmlnode);
+            $xpath = new DomXPath($xmlnode);
         }
-        foreach (self :: $namespaces as $nspre => $nsuri)
-        {
+        foreach (self:: $namespaces as $nspre => $nsuri) {
             $xpath->registerNamespace($nspre, $nsuri);
         }
         return $xpath->query($xquery);
-
     }
 
 
@@ -361,28 +348,29 @@ class CmisRepositoryWrapper
         //  -- the descendants link is put into the associative array with the "down-tree" index
         //  These links are distinquished by the mime type attribute, but these are probably the only two links that share the same rel ..
         //    so this was done as a one off
-        $links = array ();
+        $links = array();
         $link_nodes = $xmlnode->getElementsByTagName("link");
-        foreach ($link_nodes as $ln)
-        {
-            if ($ln->attributes->getNamedItem("rel")->nodeValue == "down" && $ln->attributes->getNamedItem("type")->nodeValue == "application/cmistree+xml")
-            {
+        foreach ($link_nodes as $ln) {
+            if ($ln->attributes->getNamedItem("rel")->nodeValue == "down" && $ln->attributes->getNamedItem(
+                    "type"
+                )->nodeValue == "application/cmistree+xml") {
                 //Descendents and Childredn share same "rel" but different document type
                 $links["down-tree"] = $ln->attributes->getNamedItem("href")->nodeValue;
-            } else
-            {
-                $links[$ln->attributes->getNamedItem("rel")->nodeValue] = $ln->attributes->getNamedItem("href")->nodeValue;
+            } else {
+                $links[$ln->attributes->getNamedItem("rel")->nodeValue] = $ln->attributes->getNamedItem(
+                    "href"
+                )->nodeValue;
             }
         }
         return $links;
     }
 
 
-	protected static function extractAllowableActions($xmldata)
+    protected static function extractAllowableActions($xmldata)
     {
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: extractAllowableActionsFromNode($doc);
+        return self:: extractAllowableActionsFromNode($doc);
     }
 
 
@@ -391,8 +379,7 @@ class CmisRepositoryWrapper
         $result = array();
         $allowableActions = $xmlnode->getElementsByTagName("allowableActions");
         if ($allowableActions->length > 0) {
-            foreach($allowableActions->item(0)->childNodes as $action)
-            {
+            foreach ($allowableActions->item(0)->childNodes as $action) {
                 if (isset($action->localName)) {
                     $result[$action->localName] = (preg_match("/^true$/i", $action->nodeValue) > 0);
                 }
@@ -406,8 +393,7 @@ class CmisRepositoryWrapper
     {
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: extractObjectFromNode($doc);
-
+        return self:: extractObjectFromNode($doc);
     }
 
 
@@ -419,64 +405,70 @@ class CmisRepositoryWrapper
         //  -- the Object ID
         // RRM -- NEED TO ADD ALLOWABLEACTIONS
         $retval = new stdClass();
-        $retval->links = self :: getLinksArray($xmlnode);
-        $retval->properties = array ();
+        $retval->links = self:: getLinksArray($xmlnode);
+        $retval->properties = array();
         $renditions = $xmlnode->getElementsByTagName("object")->item(0)->getElementsByTagName("rendition");
-		// Add renditions to CMIS object
-		$renditionArray = array();
-		if($renditions->length > 0){
-		  $i = 0;
-		  foreach ($renditions as $rendition) {
-		    $rend_nodes = $rendition->childNodes;
-            foreach ($rend_nodes as $rend){
-              if ($rend->localName != NULL){
-	            $renditionArray[$i][$rend->localName] = $rend->nodeValue;
-              }
-            }
-            $i++;        
-	      }
-		}
-		$retval->renditions = $renditionArray;
-        
-        $prop_nodes = $xmlnode->getElementsByTagName("object")->item(0)->getElementsByTagName("properties")->item(0)->childNodes;
-        foreach ($prop_nodes as $pn)
-        {
-        	if ($pn->attributes) {
-				//supressing errors since PHP sometimes sees DOM elements as "non-objects"
-                if(isset($pn->attributes->getNamedItem("propertyDefinitionId")->nodeValue) && isset($pn->getElementsByTagName("value")->item(0)->nodeValue)){
-				    @$retval->properties[$pn->attributes->getNamedItem("propertyDefinitionId")->nodeValue] = $pn->getElementsByTagName("value")->item(0)->nodeValue;
+        // Add renditions to CMIS object
+        $renditionArray = array();
+        if ($renditions->length > 0) {
+            $i = 0;
+            foreach ($renditions as $rendition) {
+                $rend_nodes = $rendition->childNodes;
+                foreach ($rend_nodes as $rend) {
+                    if ($rend->localName != null) {
+                        $renditionArray[$i][$rend->localName] = $rend->nodeValue;
+                    }
                 }
-			}
+                $i++;
+            }
         }
-        
+        $retval->renditions = $renditionArray;
+
+        $prop_nodes = $xmlnode->getElementsByTagName("object")->item(0)->getElementsByTagName("properties")->item(
+            0
+        )->childNodes;
+        foreach ($prop_nodes as $pn) {
+            if ($pn->attributes) {
+                //supressing errors since PHP sometimes sees DOM elements as "non-objects"
+                if (isset(
+                        $pn->attributes->getNamedItem(
+                            "propertyDefinitionId"
+                        )->nodeValue
+                    ) && isset($pn->getElementsByTagName("value")->item(0)->nodeValue)) {
+                    @$retval->properties[$pn->attributes->getNamedItem(
+                        "propertyDefinitionId"
+                    )->nodeValue] = $pn->getElementsByTagName("value")->item(0)->nodeValue;
+                }
+            }
+        }
+
         $retval->uuid = $xmlnode->getElementsByTagName("id")->item(0)->nodeValue;
         $retval->id = $retval->properties["cmis:objectId"];
         //TODO: RRM FIX THIS
         $children_node = $xmlnode->getElementsByTagName("children");
         if (is_object($children_node)) {
-        	    $children_feed_c = $children_node->item(0);
+            $children_feed_c = $children_node->item(0);
         }
         if (is_object($children_feed_c)) {
-			$children_feed_l = $children_feed_c->getElementsByTagName("feed");
+            $children_feed_l = $children_feed_c->getElementsByTagName("feed");
         }
         if (isset($children_feed_l) && is_object($children_feed_l) && is_object($children_feed_l->item(0))) {
-        	$children_feed = $children_feed_l->item(0);
-			$children_doc = new DOMDocument();
-			$xnode = $children_doc->importNode($children_feed,true); // Avoid Wrong Document Error
-			$children_doc->appendChild($xnode);
-	        $retval->children = self :: extractObjectFeedFromNode($children_doc);
+            $children_feed = $children_feed_l->item(0);
+            $children_doc = new DOMDocument();
+            $xnode = $children_doc->importNode($children_feed, true); // Avoid Wrong Document Error
+            $children_doc->appendChild($xnode);
+            $retval->children = self:: extractObjectFeedFromNode($children_doc);
         }
-		$retval->allowableActions = self :: extractAllowableActionsFromNode($xmlnode);
+        $retval->allowableActions = self:: extractAllowableActionsFromNode($xmlnode);
         return $retval;
     }
-    
+
 
     protected static function extractTypeDef($xmldata)
     {
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: extractTypeDefFromNode($doc);
-
+        return self:: extractTypeDefFromNode($doc);
     }
 
 
@@ -488,25 +480,22 @@ class CmisRepositoryWrapper
         //  -- the Object ID
         // RRM -- NEED TO ADD ALLOWABLEACTIONS
         $retval = new stdClass();
-        $retval->links = self :: getLinksArray($xmlnode);
-        $retval->properties = array ();
-        $retval->attributes = array ();
-        $result = self :: doXQueryFromNode($xmlnode, "//cmisra:type/*");
-        foreach ($result as $node)
-        {
-            if ((substr($node->nodeName, 0, 13) == "cmis:property") && (substr($node->nodeName, -10) == "Definition"))
-            {
+        $retval->links = self:: getLinksArray($xmlnode);
+        $retval->properties = array();
+        $retval->attributes = array();
+        $result = self:: doXQueryFromNode($xmlnode, "//cmisra:type/*");
+        foreach ($result as $node) {
+            if ((substr($node->nodeName, 0, 13) == "cmis:property") && (substr($node->nodeName, -10) == "Definition")) {
                 $id = $node->getElementsByTagName("id")->item(0)->nodeValue;
                 $cardinality = $node->getElementsByTagName("cardinality")->item(0)->nodeValue;
                 $propertyType = $node->getElementsByTagName("propertyType")->item(0)->nodeValue;
                 // Stop Gap for now
-                $retval->properties[$id] = array (
+                $retval->properties[$id] = array(
                     "cmis:propertyType" => $propertyType,
                     "cmis:cardinality" => $cardinality,
-                    
+
                 );
-            } else
-            {
+            } else {
                 $retval->attributes[$node->nodeName] = $node->nodeValue;
             }
             $retval->id = $retval->attributes["cmis:id"];
@@ -514,17 +503,17 @@ class CmisRepositoryWrapper
         //TODO: RRM FIX THIS
         $children_node = $xmlnode->getElementsByTagName("children");
         if (is_object($children_node)) {
-        	    $children_feed_c = $children_node->item(0);
+            $children_feed_c = $children_node->item(0);
         }
         if (is_object($children_feed_c)) {
-			$children_feed_l = $children_feed_c->getElementsByTagName("feed");
+            $children_feed_l = $children_feed_c->getElementsByTagName("feed");
         }
         if (isset($childern_feed_l) && is_object($children_feed_l) && is_object($children_feed_l->item(0))) {
-        	$children_feed = $children_feed_l->item(0);
-			$children_doc = new DOMDocument();
-			$xnode = $children_doc->importNode($children_feed,true); // Avoid Wrong Document Error
-			$children_doc->appendChild($xnode);
-	        $retval->children = self :: extractTypeFeedFromNode($children_doc);
+            $children_feed = $children_feed_l->item(0);
+            $children_doc = new DOMDocument();
+            $xnode = $children_doc->importNode($children_feed, true); // Avoid Wrong Document Error
+            $children_doc->appendChild($xnode);
+            $retval->children = self:: extractTypeFeedFromNode($children_doc);
         }
 
         /*
@@ -549,8 +538,10 @@ class CmisRepositoryWrapper
     {
         //Assumes only one workspace for now
         $doc = new DOMDocument();
-        if($xmldata) $doc->loadXML($xmldata); //TXO
-        return self :: extractObjectFeedFromNode($doc);
+        if ($xmldata) {
+            $doc->loadXML($xmldata);
+        } //TXO
+        return self:: extractObjectFeedFromNode($doc);
     }
 
 
@@ -565,16 +556,17 @@ class CmisRepositoryWrapper
         $retval = new stdClass();
         // extract total number of items
         $numItemsNode = self::doXQueryFromNode($xmlnode, "/atom:feed/cmisra:numItems");
-        $retval->numItems = $numItemsNode->length ? (int) $numItemsNode->item(0)->nodeValue : -1; // set to negative value if info is not available
-                
-        $retval->objectList = array ();
-        $retval->objectsById = array ();
-        $result = self :: doXQueryFromNode($xmlnode, "/atom:feed/atom:entry");
-        foreach ($result as $node)
-        {
-            $obj = self :: extractObjectFromNode($node);
+        $retval->numItems = $numItemsNode->length ? (int)$numItemsNode->item(
+            0
+        )->nodeValue : -1; // set to negative value if info is not available
+
+        $retval->objectList = array();
+        $retval->objectsById = array();
+        $result = self:: doXQueryFromNode($xmlnode, "/atom:feed/atom:entry");
+        foreach ($result as $node) {
+            $obj = self:: extractObjectFromNode($node);
             $retval->objectsById[$obj->id] = $obj;
-            $retval->objectList[] = & $retval->objectsById[$obj->id];
+            $retval->objectList[] = &$retval->objectsById[$obj->id];
         }
         return $retval;
     }
@@ -585,7 +577,7 @@ class CmisRepositoryWrapper
         //Assumes only one workspace for now
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: extractTypeFeedFromNode($doc);
+        return self:: extractTypeFeedFromNode($doc);
     }
 
 
@@ -597,14 +589,13 @@ class CmisRepositoryWrapper
         //   -- one sequential array (a list)
         //   -- one hash table indexed by objectID
         $retval = new stdClass();
-        $retval->objectList = array ();
-        $retval->objectsById = array ();
-        $result = self :: doXQueryFromNode($xmlnode, "/atom:feed/atom:entry");
-        foreach ($result as $node)
-        {
-            $obj = self :: extractTypeDefFromNode($node);
+        $retval->objectList = array();
+        $retval->objectsById = array();
+        $result = self:: doXQueryFromNode($xmlnode, "/atom:feed/atom:entry");
+        foreach ($result as $node) {
+            $obj = self:: extractTypeDefFromNode($node);
             $retval->objectsById[$obj->id] = $obj;
-            $retval->objectList[] = & $retval->objectsById[$obj->id];
+            $retval->objectList[] = &$retval->objectsById[$obj->id];
         }
         return $retval;
     }
@@ -615,7 +606,7 @@ class CmisRepositoryWrapper
         //Assumes only one workspace for now
         $doc = new DOMDocument();
         $doc->loadXML($xmldata);
-        return self :: extractWorkspaceFromNode($doc);
+        return self:: extractWorkspaceFromNode($doc);
     }
 
 
@@ -629,52 +620,56 @@ class CmisRepositoryWrapper
         //  Capabilities
         //  General Repository Information
         $retval = new stdClass();
-        $retval->links = self :: getLinksArray($xmlnode);
-        $retval->uritemplates = array ();
-        $retval->collections = array ();
-        $retval->capabilities = array ();
-        $retval->repositoryInfo = array ();
+        $retval->links = self:: getLinksArray($xmlnode);
+        $retval->uritemplates = array();
+        $retval->collections = array();
+        $retval->capabilities = array();
+        $retval->repositoryInfo = array();
         $retval->permissions = array();
         $retval->permissionsMapping = array();
-        $result = self :: doXQueryFromNode($xmlnode, "//cmisra:uritemplate");
-        foreach ($result as $node)
-        {
-            $retval->uritemplates[$node->getElementsByTagName("type")->item(0)->nodeValue] = $node->getElementsByTagName("template")->item(0)->nodeValue;
+        $result = self:: doXQueryFromNode($xmlnode, "//cmisra:uritemplate");
+        foreach ($result as $node) {
+            $retval->uritemplates[$node->getElementsByTagName("type")->item(
+                0
+            )->nodeValue] = $node->getElementsByTagName("template")->item(0)->nodeValue;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//app:collection");
-        foreach ($result as $node)
-        {
-            $retval->collections[$node->getElementsByTagName("collectionType")->item(0)->nodeValue] = $node->attributes->getNamedItem("href")->nodeValue;
+        $result = self:: doXQueryFromNode($xmlnode, "//app:collection");
+        foreach ($result as $node) {
+            $retval->collections[$node->getElementsByTagName("collectionType")->item(
+                0
+            )->nodeValue] = $node->attributes->getNamedItem("href")->nodeValue;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//cmis:capabilities/*");
-        foreach ($result as $node)
-        {
+        $result = self:: doXQueryFromNode($xmlnode, "//cmis:capabilities/*");
+        foreach ($result as $node) {
             $retval->capabilities[$node->nodeName] = $node->nodeValue;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//cmisra:repositoryInfo/*[name()!='cmis:capabilities' and name()!='cmis:aclCapability']");
-        foreach ($result as $node)
-        {
+        $result = self:: doXQueryFromNode(
+            $xmlnode,
+            "//cmisra:repositoryInfo/*[name()!='cmis:capabilities' and name()!='cmis:aclCapability']"
+        );
+        foreach ($result as $node) {
             $retval->repositoryInfo[$node->nodeName] = $node->nodeValue;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//cmis:aclCapability/cmis:permissions");
-        foreach ($result as $node)
-        {
-            $retval->permissions[$node->getElementsByTagName("permission")->item(0)->nodeValue] = $node->getElementsByTagName("description")->item(0)->nodeValue;
+        $result = self:: doXQueryFromNode($xmlnode, "//cmis:aclCapability/cmis:permissions");
+        foreach ($result as $node) {
+            $retval->permissions[$node->getElementsByTagName("permission")->item(
+                0
+            )->nodeValue] = $node->getElementsByTagName("description")->item(0)->nodeValue;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//cmis:aclCapability/cmis:mapping");
-        foreach ($result as $node)
-        {
+        $result = self:: doXQueryFromNode($xmlnode, "//cmis:aclCapability/cmis:mapping");
+        foreach ($result as $node) {
             $key = $node->getElementsByTagName("key")->item(0)->nodeValue;
             $values = array();
-            foreach ($node->getElementsByTagName("permission") as $value)
-            {
+            foreach ($node->getElementsByTagName("permission") as $value) {
                 array_push($values, $value->nodeValue);
             }
             $retval->permissionsMapping[$key] = $values;
         }
-        $result = self :: doXQueryFromNode($xmlnode, "//cmis:aclCapability/*[name()!='cmis:permissions' and name()!='cmis:mapping']");
-        foreach ($result as $node)
-        {
+        $result = self:: doXQueryFromNode(
+            $xmlnode,
+            "//cmis:aclCapability/*[name()!='cmis:permissions' and name()!='cmis:mapping']"
+        );
+        foreach ($result as $node) {
             $retval->repositoryInfo[$node->nodeName] = $node->nodeValue;
         }
 

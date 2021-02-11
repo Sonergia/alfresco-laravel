@@ -1,5 +1,13 @@
 <?php
-namespace Ajtarragona\AlfrescoLaravel\Exceptions;
+
+namespace Sonergia\AlfrescoLaravel\Exceptions;
+
 use Exception;
 
-class AlfrescoObjectNotFoundException extends Exception {}
+/**
+ * Class AlfrescoObjectNotFoundException
+ * @package Sonergia\AlfrescoLaravel\Exceptions
+ */
+class AlfrescoObjectNotFoundException extends Exception
+{
+}

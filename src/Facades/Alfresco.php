@@ -1,9 +1,13 @@
 <?php
 
-namespace Ajtarragona\AlfrescoLaravel\Facades; 
+namespace Sonergia\AlfrescoLaravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * Class Alfresco
+ * @package Sonergia\AlfrescoLaravel\Facades
+ */
 class Alfresco extends Facade
 {
     /**

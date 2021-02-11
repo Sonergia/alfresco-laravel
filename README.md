@@ -8,7 +8,7 @@ Alfresco-Laravel is a package that allows the management of files in a Alfresco 
 ## Installation
 
 ```bash
-composer require ajtarragona/alfresco-laravel:"@dev"
+composer require sonergia/alfresco-laravel:"^1.0"
 ```
 
 ## Service Provider
@@ -16,7 +16,7 @@ composer require ajtarragona/alfresco-laravel:"@dev"
 After the installation, you need to register Alfresco-Laravel in your `config/app.php` file, find the providers array and add:
 
 ```php
-Ajtarragona\AlfrescoLaravel\AlfrescoLaravelServiceProvider::class,
+Sonergia\AlfrescoLaravel\AlfrescoLaravelServiceProvider::class,
 ```
 
 ## Alias
@@ -24,7 +24,7 @@ Ajtarragona\AlfrescoLaravel\AlfrescoLaravelServiceProvider::class,
 For a simpler use of this package, register the alias in the alias array in your `config/app.php` file adding:
 
 ```php
-'Alfresco' => Ajtarragona\AlfrescoLaravel\Models\AlfrescoLaravel::class
+'Alfresco' => Sonergia\AlfrescoLaravel\Models\AlfrescoLaravel::class
 ```
 
 ## Configuration

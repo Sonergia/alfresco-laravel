@@ -1,5 +1,5 @@
 {
-    "name": "ajtarragona/alfresco-laravel",
+    "name": "sonergia/alfresco-laravel",
     "keywords" : ["laravel5","laravel","alfresco"],
     "license": "MIT",
     "description": "Integration of Alfresco in Laravel",
@@ -21,16 +21,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Ajtarragona\\AlfrescoLaravel\\": "src"
+            "Sonergia\\AlfrescoLaravel\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ajtarragona\\AlfrescoLaravel\\AlfrescoLaravelServiceProvider"
+                "Sonergia\\AlfrescoLaravel\\AlfrescoLaravelServiceProvider"
             ],
             "aliases": {
-                "Alfresco" : "Ajtarragona\\AlfrescoLaravel\\Facades\\Alfresco"
+                "Alfresco" : "Sonergia\\AlfrescoLaravel\\Facades\\Alfresco"
         
             }
         }

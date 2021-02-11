@@ -3,6 +3,7 @@
     "keywords" : ["laravel5","laravel","alfresco"],
     "license": "MIT",
     "description": "Integration of Alfresco in Laravel",
+    "version": "1.0.2",
     "authors": [
         {
             "name": "Ruben Macias",
